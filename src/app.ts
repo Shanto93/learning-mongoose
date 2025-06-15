@@ -25,6 +25,18 @@ const noteSchema = new mongoose.Schema({
 
 const Note = mongoose.model("Note", noteSchema);
 
+// GET ALL Notes
+app.get("/notes", async (req: Request, res: Response) => {
+  const notes = await Note.find();
+  res.status(201).json({
+    success: true,
+    message: "All Notes",
+    note: notes,
+  });
+});
+
+
+// POST note
 app.post("/note/create-note", async (req: Request, res: Response) => {
   const body = req.body;
 
