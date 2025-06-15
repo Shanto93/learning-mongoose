@@ -1,4 +1,5 @@
 import express, { Application, Request, Response } from "express";
+import { ObjectId } from "mongodb";
 import mongoose, { Schema } from "mongoose";
 
 const app: Application = express();
@@ -35,6 +36,19 @@ app.get("/notes", async (req: Request, res: Response) => {
   });
 });
 
+// GET Single Note
+app.get("/notes/:id", async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const filter = {
+    _id: new ObjectId(id),
+  };
+  const note = await Note.findOne(filter);
+  res.status(201).json({
+    success: true,
+    message: "Your Searched note",
+    note: note,
+  });
+});
 
 // POST note
 app.post("/note/create-note", async (req: Request, res: Response) => {
