@@ -6,23 +6,29 @@ const app: Application = express();
 
 app.use(express.json());
 
-const noteSchema = new mongoose.Schema({
-  title: { type: String, require: true, trim: true },
-  content: { type: String, default: "" },
-  categories: {
-    type: String,
-    enum: ["personal", "work", "study", "others"],
-    default: "personal",
+const noteSchema = new mongoose.Schema(
+  {
+    title: { type: String, require: true, trim: true },
+    content: { type: String, default: "" },
+    categories: {
+      type: String,
+      enum: ["personal", "work", "study", "others"],
+      default: "personal",
+    },
+    pinned: {
+      type: Boolean,
+      default: false,
+    },
+    tags: {
+      label: { type: String, require: true },
+      color: { type: String, default: "gray" },
+    },
   },
-  pinned: {
-    type: Boolean,
-    default: false,
-  },
-  tags: {
-    label: { type: String, require: true },
-    color: { type: String, default: "gray" },
-  },
-});
+  {
+    versionKey: false,
+    timestamps: true,
+  }
+);
 
 const Note = mongoose.model("Note", noteSchema);
 
@@ -72,6 +78,44 @@ app.post("/note/create-note", async (req: Request, res: Response) => {
     success: true,
     message: "Note created successfully",
     note: note,
+  });
+});
+
+// Update a Note
+app.patch("/notes/update-note/:id", async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const body = req.body;
+  // const filter = {
+  //   _id: new ObjectId(id),
+  // };
+
+  // const updatedNote = {
+  //   $set: {
+  //     title: body.title,
+  //     content: body.content,
+  //     categories: body.categories,
+  //     pinned: body.pinned,
+  //     tags: body.tags,
+  //   },
+  // };
+
+  const note = await Note.findByIdAndUpdate(id, body, { new: true });
+  res.status(201).json({
+    success: true,
+    message: "Updated Note",
+    note: note,
+  });
+});
+
+// Delete a Note
+app.delete("/notes/delete-note/:id", async (req: Request, res: Response) => {
+  const id = req.params.id;
+
+  const deletedNote = await Note.findByIdAndDelete(id);
+  res.status(201).json({
+    success: true,
+    message: "Deleted Note",
+    note: deletedNote,
   });
 });
 
