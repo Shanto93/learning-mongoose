@@ -1,7 +1,17 @@
 import express, { Request, Response } from "express";
 import { User } from "../models/users.model";
+import { email, z } from "zod/v4";
 
 export const userRoutes = express.Router();
+
+const zodeValidate = z.object({
+  firstName: z.string(),
+  lastName: z.string(),
+  age: z.number(),
+  email: z.string(),
+  password: z.string(),
+  role: z.string().optional(),
+});
 
 // Get all users
 userRoutes.get("/", async (req: Request, res: Response) => {
@@ -26,13 +36,23 @@ userRoutes.get("/:userId", async (req: Request, res: Response) => {
 
 // Post user data
 userRoutes.post("/create-user", async (req: Request, res: Response) => {
-  const userData = req.body;
-  const createUser = await User.create(userData);
-  res.status(201).json({
-    success: true,
-    message: "User Created Successfully",
-    data: createUser,
-  });
+  // const userData = req.body;
+  try {
+    const userData = zodeValidate.parse(req.body);
+    const createUser = await User.create(userData);
+    res.status(201).json({
+      success: true,
+      message: "User Created Successfully",
+      data: createUser,
+    });
+  } catch (error: any) {
+    res.status(404).json({
+      success: false,
+      message: "User creation failed",
+      data: error.message,
+      error,
+    });
+  }
 });
 
 // Update user data

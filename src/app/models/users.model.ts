@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import type { IUser } from "../interfaces/user.interfaces";
+import validator from "validator";
 
 const userSchema = new mongoose.Schema<IUser>(
   {
@@ -27,12 +28,13 @@ const userSchema = new mongoose.Schema<IUser>(
       unique: [true, "Email should be unique"],
       lowercase: true,
       trim: true,
-      validate: {
-        validator: function (v) {
-          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-        },
-        message: "Invalid email address",
-      },
+      // validate: {
+      //   validator: function (v) {
+      //     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+      //   },
+      //   message: "Invalid email address",
+      // },
+      validate: [validator.isEmail, "Invalid Email {VALUE}"],
     },
     password: {
       type: String,
