@@ -69,7 +69,13 @@ const userSchema = new mongoose.Schema<IUser>(
   {
     versionKey: false,
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
+
+userSchema.virtual("fullName").get(function () {
+  return `${this.firstName} ${this.lastName}`;
+});
 
 export const User = mongoose.model<IUser>("User", userSchema);
