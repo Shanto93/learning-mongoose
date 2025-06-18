@@ -1,18 +1,29 @@
 import mongoose from "mongoose";
-import type { IUser } from "../interfaces/user.interfaces";
+import type { IAddress, IUser } from "../interfaces/user.interfaces";
 import validator from "validator";
+
+const addressSchema = new mongoose.Schema<IAddress>(
+  {
+    city: String,
+    post: String,
+    zip: Number,
+  },
+  {
+    _id: false,
+  }
+);
 
 const userSchema = new mongoose.Schema<IUser>(
   {
     firstName: {
       type: String,
-      require: [true, "First Name is required"],
+      required: [true, "First Name is required"],
       trim: true,
       maxlength: [50, "First Name should be maximum 50 characters"],
     },
     lastName: {
       type: String,
-      require: [true, "Last Name is required."],
+      required: [true, "Last Name is required."],
       trim: true,
       maxlength: [50, "Last Name should be maximum 50 characters"],
     },
@@ -20,25 +31,19 @@ const userSchema = new mongoose.Schema<IUser>(
       type: Number,
       required: [true, "Age is required"],
       max: [60, "Age should be maximum 60"],
-      min: [18, "Age should be maximum 60"],
+      min: [18, "Age should be minimum 18"],
     },
     email: {
       type: String,
-      require: [true, "Email is required"],
+      required: [true, "Email is required"],
       unique: [true, "Email should be unique"],
       lowercase: true,
       trim: true,
-      // validate: {
-      //   validator: function (v) {
-      //     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-      //   },
-      //   message: "Invalid email address",
-      // },
       validate: [validator.isEmail, "Invalid Email {VALUE}"],
     },
     password: {
       type: String,
-      require: [true, "Password is required."],
+      required: [true, "Password is required."],
       validate: {
         validator: function (pass) {
           return /^(?=.*[A-Z])(?=.*\d).+$/.test(pass);
@@ -55,6 +60,10 @@ const userSchema = new mongoose.Schema<IUser>(
         message: "Role is not valid. got {VALUE} role",
       },
       default: "user",
+    },
+    address: {
+      type: addressSchema,
+      required: true,
     },
   },
   {

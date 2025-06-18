@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { INotes } from "./../interfaces/notes.interfaces";
 
 const noteSchema = new mongoose.Schema<INotes>(
@@ -17,6 +17,11 @@ const noteSchema = new mongoose.Schema<INotes>(
     tags: {
       label: { type: String, require: true },
       color: { type: String, default: "gray" },
+    },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
   },
   {

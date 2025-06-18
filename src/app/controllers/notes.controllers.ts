@@ -5,7 +5,7 @@ export const noteRoutes = express.Router();
 
 // GET ALL Notes
 noteRoutes.get("/", async (req: Request, res: Response) => {
-  const notes = await Note.find();
+  const notes = await Note.find().populate("user");
   res.status(201).json({
     success: true,
     message: "All Notes",
@@ -38,7 +38,7 @@ noteRoutes.post("/create-note", async (req: Request, res: Response) => {
   // await myNote.save();
 
   //noteRoutesroach-2
-  const note = await Note.create(body);
+  const note = await await Note.create(body);
 
   res.status(201).json({
     success: true,

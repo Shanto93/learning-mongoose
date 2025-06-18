@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import { User } from "../models/users.model";
-import { email, z } from "zod/v4";
+import { z } from "zod/v4";
+import bcrypt from "bcryptjs";
 
 export const userRoutes = express.Router();
 
@@ -11,6 +12,11 @@ const zodeValidate = z.object({
   email: z.string(),
   password: z.string(),
   role: z.string().optional(),
+  address: z.object({
+    city: z.string(),
+    post: z.string(),
+    zip: z.number(),
+  }),
 });
 
 // Get all users
@@ -36,10 +42,12 @@ userRoutes.get("/:userId", async (req: Request, res: Response) => {
 
 // Post user data
 userRoutes.post("/create-user", async (req: Request, res: Response) => {
-  // const userData = req.body;
+  // const body = req.body;
   try {
     const userData = zodeValidate.parse(req.body);
     const createUser = await User.create(userData);
+    const hashedPassword = await bcrypt.hash(createUser.password, 10);
+    createUser.password = hashedPassword;
     res.status(201).json({
       success: true,
       message: "User Created Successfully",
